@@ -5,8 +5,8 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.3.7"
-set "RAW_VER=https://raw.githubusercontent.com/pqzqws9xh6gb4eu/fix/refs/heads/main/version.txt"
+set "CURRENT_VER=2.3.6"
+set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
 set "NEWFILE=%DESKTOP%\FixWave.bat"
