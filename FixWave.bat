@@ -5,9 +5,9 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.3.6"
+set "CURRENT_VER=2.3.7"
 set "RAW_VER=https://raw.githubusercontent.com/pqzqws9xh6gb4eu/fix/refs/heads/main/version.txt"
-set "RAW_BAT=https://raw.githubusercontent.com/pqzqws9xh6gb4eu/fix/refs/heads/main/FixWave.bat"
+set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
 set "NEWFILE=%DESKTOP%\FixWave.bat"
 set "LATEST_VER="
@@ -277,7 +277,7 @@ echo [+] Defender exclusions applied.
 echo.
 echo [*] Fixing Wave Module...
 echo.
-set "MODULE_URL=https://github.com/pqzqws9xh6gb4eu/fix/releases/download/hellow/Module.zip"
+set "MODULE_URL=https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/Module.zip"
 set "ZIP_NAME=Wave_Module.zip"
 set "DEST_DIR=%LOCALAPPDATA%"
 set "WAVE_DIR=%DEST_DIR%\Wave"
@@ -417,7 +417,7 @@ taskkill /f /im msedgewebview2.exe >nul 2>&1
 taskkill /f /im msedge.exe >nul 2>&1
 timeout /t 2 >nul
 set "WAVE_LOADER_DIR=%LOCALAPPDATA%\wave"
-set "ZIP_URL=https://github.com/pqzqws9xh6gb4eu/fix/releases/download/hellow/Loader.zip"
+set "ZIP_URL=https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/Loader.zip"
 set "ZIP_PATH=%TEMP%\Loader.zip"
 if not exist "%WAVE_LOADER_DIR%" mkdir "%WAVE_LOADER_DIR%"
 echo [*] Downloading Loader.zip...
