@@ -5,7 +5,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.3.7"
+set "CURRENT_VER=2.3.8"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
@@ -174,8 +174,6 @@ if not exist "%LOCALAPPDATA%\Wave" mkdir "%LOCALAPPDATA%\Wave"
 if not exist "%LOCALAPPDATA%\Wave\Tabs" mkdir "%LOCALAPPDATA%\Wave\Tabs"
 echo.
 echo [*] Installing dependencies...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet9.exe'"
-if exist "%TargetDir%\dotnet9.exe" start /wait "" "%TargetDir%\dotnet9.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet8.exe'"
 if exist "%TargetDir%\dotnet8.exe" start /wait "" "%TargetDir%\dotnet8.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet6.exe'"
@@ -189,9 +187,6 @@ if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
     start /wait "" "%TargetDir%\dotnet3.1.32.exe" /install /quiet /norestart
 )
-
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi' -OutFile '%TargetDir%\node.msi'"
-if exist "%TargetDir%\node.msi" start /wait msiexec /i "%TargetDir%\node.msi" /quiet /norestart
 echo [Success] Dependencies installed.
 echo.
 echo [*] Downloading Wave.exe...
@@ -695,8 +690,6 @@ if %errorlevel%==0 (
 if %FOUND%==0 echo [!] Not found.
 echo.
 echo [*] Reinstalling runtimes...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet9.exe'"
-if exist "%TargetDir%\dotnet9.exe" start /wait "" "%TargetDir%\dotnet9.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet8.exe'"
 if exist "%TargetDir%\dotnet8.exe" start /wait "" "%TargetDir%\dotnet8.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe' -OutFile '%TargetDir%\dotnet6.exe'"
@@ -710,8 +703,6 @@ if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
     start /wait "" "%TargetDir%\dotnet3.1.32.exe" /install /quiet /norestart
 )
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi' -OutFile '%TargetDir%\node.msi'"
-if exist "%TargetDir%\node.msi" start /wait msiexec /i "%TargetDir%\node.msi" /quiet /norestart
 echo [Success] Repair complete.
 pause
 goto mainmenu
@@ -719,45 +710,75 @@ goto mainmenu
 :boot_menu
 cls
 echo +==========================================================================+
-echo ^|                     ROBLOX BOOTSTRAPPER MENU                             ^|
+echo ^|                      ROBLOX BOOTSTRAPPER MENU                          ^|
 echo +==========================================================================+
 echo.
-echo [1] Bloxstrap v2.9.1 (official - recommended)
-echo [2] Fishstrap v2.9.1.2 (FPS unlocker)
-echo [3] MTX-Bloxstrap-Installer-2.9.0 (advanced)
+echo [1] WaveStrap (official ZIP - Fixed Path)
+echo [2] Bloxstrap v2.9.1
+echo [3] Fishstrap v2.9.1.2
 echo [B] Back to main menu
 echo.
 set /p "CHOICE=Select: "
 set "BOOT_NAME="
 set "BOOT_URL="
-if /I "%CHOICE%"=="1" (
-    set "BOOT_NAME=Bloxstrap v2.9.1"
+set "IS_ZIP=0"
+
+if "%CHOICE%"=="1" (
+    set "BOOT_NAME=WaveStrap"
+    set "BOOT_URL=https://github.com/redyfoxsyr0/WaveStrap/releases/download/GetWaveStrap/Wave-Strap.zip"
+    set "IS_ZIP=1"
+)
+if "%CHOICE%"=="2" (
+    set "BOOT_NAME=Bloxstrap"
     set "BOOT_URL=https://github.com/bloxstraplabs/bloxstrap/releases/download/v2.9.1/Bloxstrap-v2.9.1.exe"
 )
-if /I "%CHOICE%"=="2" (
-    set "BOOT_NAME=Fishstrap v2.9.1.2"
+if "%CHOICE%"=="3" (
+    set "BOOT_NAME=Fishstrap"
     set "BOOT_URL=https://github.com/fishstrap/fishstrap/releases/download/v2.9.1.2/Fishstrap-v2.9.1.2.exe"
-)
-if /I "%CHOICE%"=="3" (
-    set "BOOT_NAME=MTX-Bloxstrap-Installer-2.9.0"
-    set "BOOT_URL=https://github.com/Syr0nix/-MTX/releases/download/MTX/MTX-Bloxstrap-Installer-2.9.0.exe"
 )
 if /I "%CHOICE%"=="B" goto mainmenu
 if not defined BOOT_NAME goto boot_menu
+
 if not exist "%TargetDir%\Boot" mkdir "%TargetDir%\Boot"
-set "BOOT_EXE=%TargetDir%\Boot\%BOOT_NAME%.exe"
+
 echo.
-echo [*] Downloading %BOOT_NAME%...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri '%BOOT_URL%' -OutFile '%BOOT_EXE%'"
-if exist "%BOOT_EXE%" (
-    echo [Success] Downloaded.
-    powershell -NoProfile -Command "Start-Process -FilePath '%BOOT_EXE%' -Verb RunAs"
+if "%IS_ZIP%"=="1" (
+    set "TEMP_ZIP=%TargetDir%\Boot\WaveStrap.zip"
+    set "EXTRACT_DIR=%TargetDir%\Boot\WaveStrap"
+    
+    echo [*] Downloading WaveStrap ZIP...
+    powershell -NoProfile -Command "Invoke-WebRequest -Uri '%BOOT_URL%' -OutFile '!TEMP_ZIP!'"
+    
+    echo [*] Extracting package...
+    if exist "!EXTRACT_DIR!" rmdir /s /q "!EXTRACT_DIR!"
+    mkdir "!EXTRACT_DIR!"
+    powershell -NoProfile -Command "Expand-Archive -Path '!TEMP_ZIP!' -DestinationPath '!EXTRACT_DIR!' -Force"
+    
+    echo [*] Searching subfolders for Wave-Strap.exe...
+    set "FOUND_PATH="
+    :: This searches recursively through EVERY subfolder for the exe
+    for /r "!EXTRACT_DIR!" %%f in (Wave-Strap.exe) do (
+        if exist "%%f" set "FOUND_PATH=%%f"
+    )
+
+    if defined FOUND_PATH (
+        echo [Success] Found at: "!FOUND_PATH!"
+        powershell -NoProfile -Command "Start-Process -FilePath '!FOUND_PATH!' -Verb RunAs"
+    ) else (
+        echo [Error] Could not find Wave-Strap.exe in extracted folders how ever did install.
+        explorer "!EXTRACT_DIR!"
+    )
+    del "!TEMP_ZIP!" 2>nul
 ) else (
-    echo [Error] Failed.
+    set "BOOT_EXE=%TargetDir%\Boot\%BOOT_NAME%.exe"
+    echo [*] Downloading %BOOT_NAME%...
+    powershell -NoProfile -Command "Invoke-WebRequest -Uri '%BOOT_URL%' -OutFile '%BOOT_EXE%'"
+    if exist "%BOOT_EXE%" (
+        powershell -NoProfile -Command "Start-Process -FilePath '%BOOT_EXE%' -Verb RunAs"
+    )
 )
+
 echo.
-echo Saved in C:\WaveSetup\Boot
 pause
 goto mainmenu
-
 
