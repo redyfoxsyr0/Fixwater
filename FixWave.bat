@@ -182,9 +182,8 @@ powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/rel
 if exist "%TargetDir%\vcx86.exe" start /wait "" "%TargetDir%\vcx86.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile '%TargetDir%\vcx64.exe'"
 if exist "%TargetDir%\vcx64.exe" start /wait "" "%TargetDir%\vcx64.exe" /install /quiet /norestart
-echo [*] Installing DirectX (dxwebsetup)...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.microsoft.com/download/1/7/1/1718ccc4-6315-4d8e-9543-8e28a4e18c4c/dxwebsetup.exe' -OutFile '%TargetDir%\dxwebsetup.exe'"
-if exist "%TargetDir%\dxwebsetup.exe" start /wait "" "%TargetDir%\dxwebsetup.exe" /Q
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll'"
+if exist "%TargetDir%\WebView2Loader.dll" ( echo [+] WebView2Loader.dll downloaded.) else ( echo [!] Failed to download WebView2Loader.dll)
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe' -OutFile '%TargetDir%\dotnet3.1.32.exe'" >nul 2>&1
 if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
@@ -701,9 +700,8 @@ powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/rel
 if exist "%TargetDir%\vcx86.exe" start /wait "" "%TargetDir%\vcx86.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile '%TargetDir%\vcx64.exe'"
 if exist "%TargetDir%\vcx64.exe" start /wait "" "%TargetDir%\vcx64.exe" /install /quiet /norestart
-echo [*] Installing DirectX (dxwebsetup)...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.microsoft.com/download/1/7/1/1718ccc4-6315-4d8e-9543-8e28a4e18c4c/dxwebsetup.exe' -OutFile '%TargetDir%\dxwebsetup.exe'"
-if exist "%TargetDir%\dxwebsetup.exe" start /wait "" "%TargetDir%\dxwebsetup.exe" /Q
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll'"
+if exist "%TargetDir%\WebView2Loader.dll" ( echo [+] WebView2Loader.dll downloaded.) else ( echo [!] Failed to download WebView2Loader.dll)
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe' -OutFile '%TargetDir%\dotnet3.1.32.exe'" >nul 2>&1
 if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
