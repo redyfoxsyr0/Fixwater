@@ -5,7 +5,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.3.8"
+set "CURRENT_VER=2.3.9"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
@@ -182,6 +182,9 @@ powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/rel
 if exist "%TargetDir%\vcx86.exe" start /wait "" "%TargetDir%\vcx86.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile '%TargetDir%\vcx64.exe'"
 if exist "%TargetDir%\vcx64.exe" start /wait "" "%TargetDir%\vcx64.exe" /install /quiet /norestart
+echo [*] Installing DirectX (dxwebsetup)...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.microsoft.com/download/1/7/1/1718ccc4-6315-4d8e-9543-8e28a4e18c4c/dxwebsetup.exe' -OutFile '%TargetDir%\dxwebsetup.exe'"
+if exist "%TargetDir%\dxwebsetup.exe" start /wait "" "%TargetDir%\dxwebsetup.exe" /Q
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe' -OutFile '%TargetDir%\dotnet3.1.32.exe'" >nul 2>&1
 if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
@@ -698,6 +701,9 @@ powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/rel
 if exist "%TargetDir%\vcx86.exe" start /wait "" "%TargetDir%\vcx86.exe" /install /quiet /norestart
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile '%TargetDir%\vcx64.exe'"
 if exist "%TargetDir%\vcx64.exe" start /wait "" "%TargetDir%\vcx64.exe" /install /quiet /norestart
+echo [*] Installing DirectX (dxwebsetup)...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.microsoft.com/download/1/7/1/1718ccc4-6315-4d8e-9543-8e28a4e18c4c/dxwebsetup.exe' -OutFile '%TargetDir%\dxwebsetup.exe'"
+if exist "%TargetDir%\dxwebsetup.exe" start /wait "" "%TargetDir%\dxwebsetup.exe" /Q
 powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe' -OutFile '%TargetDir%\dotnet3.1.32.exe'" >nul 2>&1
 if exist "%TargetDir%\dotnet3.1.32.exe" (
     echo Installing .NET 3.1.32...
@@ -781,4 +787,3 @@ if "%IS_ZIP%"=="1" (
 echo.
 pause
 goto mainmenu
-
