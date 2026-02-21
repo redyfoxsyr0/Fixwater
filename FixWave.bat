@@ -5,7 +5,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.4.0"
+set "CURRENT_VER=2.4.1"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
@@ -748,36 +748,78 @@ echo.
 if "%IS_ZIP%"=="1" (
     set "TEMP_ZIP=%TargetDir%\Boot\WaveStrap.zip"
     set "EXTRACT_DIR=%TargetDir%\Boot\WaveStrap"
-    
+
     echo [*] Downloading WaveStrap ZIP...
-    powershell -NoProfile -Command "Invoke-WebRequest -Uri '%BOOT_URL%' -OutFile '!TEMP_ZIP!'"
-    
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+      "try { Invoke-WebRequest -UseBasicParsing -Uri '!BOOT_URL!' -OutFile '!TEMP_ZIP!' -ErrorAction Stop } catch { Write-Host '[ERROR] Download failed:' $_.Exception.Message; exit 1 }" >nul 2>&1
+
+    if errorlevel 1 (
+        echo [ERROR] WaveStrap ZIP download failed.
+        pause
+        goto boot_menu
+    )
+    if not exist "!TEMP_ZIP!" (
+        echo [ERROR] Download finished but zip is missing: "!TEMP_ZIP!"
+        pause
+        goto boot_menu
+    )
+
     echo [*] Extracting package...
     if exist "!EXTRACT_DIR!" rmdir /s /q "!EXTRACT_DIR!"
     mkdir "!EXTRACT_DIR!"
-    powershell -NoProfile -Command "Expand-Archive -Path '!TEMP_ZIP!' -DestinationPath '!EXTRACT_DIR!' -Force"
-    
-    echo [*] Searching subfolders for Wave-Strap.exe...
-    set "FOUND_PATH="
-    :: This searches recursively through EVERY subfolder for the exe
-    for /r "!EXTRACT_DIR!" %%f in (Wave-Strap.exe) do (
-        if exist "%%f" set "FOUND_PATH=%%f"
+
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+      "try { Expand-Archive -Path '!TEMP_ZIP!' -DestinationPath '!EXTRACT_DIR!' -Force -ErrorAction Stop } catch { Write-Host '[ERROR] Extract failed:' $_.Exception.Message; exit 1 }" >nul 2>&1
+
+    del "!TEMP_ZIP!" 2>nul
+
+    if errorlevel 1 (
+        echo [ERROR] Failed to extract WaveStrap ZIP.
+        pause
+        goto boot_menu
     )
 
+    echo [*] Locating Wave-Strap.exe...
+    set "FOUND_PATH="
+
+    rem 1) Check expected path first
+    if exist "!EXTRACT_DIR!\Release\net8.0-windows\Wave-Strap.exe" (
+        set "FOUND_PATH=!EXTRACT_DIR!\Release\net8.0-windows\Wave-Strap.exe"
+    )
+
+    rem 2) Fallback search
+    if not defined FOUND_PATH (
+        for /r "!EXTRACT_DIR!" %%f in (Wave-Strap.exe) do (
+            set "FOUND_PATH=%%~ff"
+            goto :FoundWaveStrapExe
+        )
+    )
+
+:FoundWaveStrapExe
     if defined FOUND_PATH (
         echo [Success] Found at: "!FOUND_PATH!"
-        powershell -NoProfile -Command "Start-Process -FilePath '!FOUND_PATH!' -Verb RunAs"
+        start "" "!FOUND_PATH!"
     ) else (
-        echo [Error] Could not find Wave-Strap.exe in extracted folders how ever did install.
+        echo [Error] Could not find Wave-Strap.exe after extraction.
         explorer "!EXTRACT_DIR!"
     )
-    del "!TEMP_ZIP!" 2>nul
+
 ) else (
     set "BOOT_EXE=%TargetDir%\Boot\%BOOT_NAME%.exe"
     echo [*] Downloading %BOOT_NAME%...
-    powershell -NoProfile -Command "Invoke-WebRequest -Uri '%BOOT_URL%' -OutFile '%BOOT_EXE%'"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+      "try { Invoke-WebRequest -UseBasicParsing -Uri '%BOOT_URL%' -OutFile '%BOOT_EXE%' -ErrorAction Stop } catch { Write-Host '[ERROR] Download failed:' $_.Exception.Message; exit 1 }" >nul 2>&1
+
+    if errorlevel 1 (
+        echo [ERROR] %BOOT_NAME% download failed.
+        pause
+        goto boot_menu
+    )
+
     if exist "%BOOT_EXE%" (
-        powershell -NoProfile -Command "Start-Process -FilePath '%BOOT_EXE%' -Verb RunAs"
+        start "" "%BOOT_EXE%"
+    ) else (
+        echo [ERROR] Download finished but file is missing: "%BOOT_EXE%"
     )
 )
 
