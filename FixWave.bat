@@ -5,7 +5,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.4.1"
+set "CURRENT_VER=2.4.2"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
@@ -179,6 +179,16 @@ call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C8
 call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe" "vc2008_x64.exe" "/qb"
 echo [+] WebView2Loader...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
+echo.
+echo [+] WebView2Loader...
+powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
+echo [*] Moving WebView2Loader.dll to C:\WaveSetup...
+if exist "%TargetDir%\WebView2Loader.dll" (
+    move /y "%TargetDir%\WebView2Loader.dll" "%WAVE_INSTALL%\WebView2Loader.dll" >nul
+    echo [Success] Moved WebView2Loader.dll
+) else (
+    echo [ERROR] WebView2Loader.dll was not downloaded.
+)
 echo.
 echo [*] Downloading Wave.exe...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri \"%WaveURL%\" -OutFile \"%InstallerPath%\" -UserAgent 'Mozilla/5.0'"
