@@ -6,7 +6,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
 
-set "CURRENT_VER=2.4.3"
+set "CURRENT_VER=2.4.2"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 
@@ -159,8 +159,7 @@ set "WAVE_WEBVIEW=%LOCALAPPDATA%\Wave.WebView2"
 set "TargetDir=%WAVE_INSTALL%\Dependencies"
 
 echo [+] Applying Windows Defender exclusions...
-powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue"
-
+powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue; if (Test-Path '%LOCALAPPDATA%\Wave\Loader.exe') { Add-MpPreference -ExclusionProcess '%LOCALAPPDATA%\Wave\Loader.exe' -ErrorAction SilentlyContinue }"
 echo [*] Cleaning up old processes and files...
 taskkill /f /im "Wave.exe" /im "Wave-Setup.exe" /im "Bloxstrap.exe" /im "Fishstrap.exe" /im "Roblox.exe" >nul 2>&1
 rmdir /s /q "%WAVE_WEBVIEW%" 2>nul
@@ -235,16 +234,21 @@ cls
 set "WAVE_INSTALL=C:\WaveSetup"
 set "WAVE_DIR=%LOCALAPPDATA%\Wave"
 set "WAVE_WEBVIEW=%LOCALAPPDATA%\Wave.WebView2"
+set "WAVE_LOADER=%LOCALAPPDATA%\Wave\Loader.exe"
+
 echo [+] Adding Windows Defender exclusions:
 echo     %WAVE_INSTALL%
 echo     %WAVE_DIR%
 echo     %WAVE_WEBVIEW%
+echo     %WAVE_LOADER%
 echo.
+
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "try { ^
   Add-MpPreference -ExclusionPath '%WAVE_INSTALL%' -ErrorAction Stop; ^
   Add-MpPreference -ExclusionPath '%WAVE_DIR%' -ErrorAction Stop; ^
   Add-MpPreference -ExclusionPath '%WAVE_WEBVIEW%' -ErrorAction Stop; ^
+  if (Test-Path '%WAVE_LOADER%') { Add-MpPreference -ExclusionProcess '%WAVE_LOADER%' -ErrorAction Stop } ^
   Write-Host '[OK] Exclusions added.' ^
 } catch { ^
   Write-Host '[FAIL]' $_.Exception.Message ^
@@ -258,6 +262,7 @@ if %errorlevel% neq 0 (
   pause
   goto mainmenu
 )
+
 echo.
 echo [+] All Defender exclusions applied!
 pause
@@ -445,11 +450,9 @@ echo [+] Adding Windows Defender exclusions:
 echo     %WAVE_INSTALL%
 echo     %WAVE_DIR%
 echo     %WAVE_WEBVIEW%
+echo     %LOCALAPPDATA%\Wave\Loader.exe
 echo.
-powershell -NoProfile -Command ^
-"Add-MpPreference -ExclusionPath '%WAVE_INSTALL%' -ErrorAction SilentlyContinue; ^
- Add-MpPreference -ExclusionPath '%WAVE_DIR%' -ErrorAction SilentlyContinue; ^
- Add-MpPreference -ExclusionPath '%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue"
+powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue; if (Test-Path '%LOCALAPPDATA%\Wave\Loader.exe') { Add-MpPreference -ExclusionProcess '%LOCALAPPDATA%\Wave\Loader.exe' -ErrorAction SilentlyContinue }"
 echo [+] Defender exclusions applied.
 echo.
 echo [*] Fixing Wave Loader...
