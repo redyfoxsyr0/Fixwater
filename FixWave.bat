@@ -5,22 +5,28 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
-set "CURRENT_VER=2.4.2"
+
+set "CURRENT_VER=2.4.3"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
+
 for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "DESKTOP=%%D"
 set "NEWFILE=%DESKTOP%\FixWave.bat"
 set "LATEST_VER="
+
 for /f "usebackq delims=" %%V in (`
   powershell -NoProfile -Command ^
   "try { (Invoke-WebRequest -UseBasicParsing '%RAW_VER%').Content.Trim() } catch { '' }"
 `) do set "LATEST_VER=%%V"
+
 if not defined LATEST_VER goto :after_update
 if "%LATEST_VER%"=="%CURRENT_VER%" goto :after_update
+
 echo [UPDATE] %CURRENT_VER% -> %LATEST_VER%
 echo [UPDATE] Downloading new version...
 powershell -NoProfile -Command ^
   "Invoke-WebRequest -UseBasicParsing '%RAW_BAT%' -OutFile '%NEWFILE%'"
+
 if not exist "%NEWFILE%" (
     echo [UPDATE][FAIL] Download blocked
     pause
@@ -34,20 +40,23 @@ del "%DESKTOP%\%CURRENT_VER%" >nul 2>&1
 for /f "delims=" %%F in ('dir /b "%DESKTOP%" ^| findstr /R "^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$"') do (
     del "%DESKTOP%\%%F" >nul 2>&1
 )
-
 del "%DESKTOP%\version.txt" >nul 2>&1
+
 echo [UPDATE] Update applied successfully.
 echo [UPDATE] Relaunching...
 start "" "%~f0"
 exit /b
+
 :after_update
 
-title RedFox Wave Installer - v2.0
+title RedFox Wave Installer - v3.0
 color 0B
+
 set "WINMAJOR="
 for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command ^
   "$v=[Environment]::OSVersion.Version.Major; if($v){$v}"`
 ) do set "WINMAJOR=%%V"
+
 if defined WINMAJOR (
     for /f "delims=0123456789" %%Z in ("%WINMAJOR%") do set "WINMAJOR="
 )
@@ -66,6 +75,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 if /I "%~1"=="-elevated" shift
+
 set "TargetDir=C:\WaveSetup"
 set "InstallerPath=%TargetDir%\Wave.exe"
 set "WaveURL=https://getwave.gg/downloads/Wave.exe"
@@ -114,6 +124,7 @@ echo ^| [X] Exit                                                                
 echo +==========================================================================+
 echo.
 set /p "MAINCHOICE=Choose option: "
+
 if /I "%MAINCHOICE%"=="1" goto install_wave
 if /I "%MAINCHOICE%"=="2" goto Fix_Module_Error
 if /I "%MAINCHOICE%"=="3" goto Loader_fix
@@ -124,6 +135,7 @@ if /I "%MAINCHOICE%"=="7" goto install_warp
 if /I "%MAINCHOICE%"=="8" goto DEFENDER_EXCLUSIONS
 if /I "%MAINCHOICE%"=="9" goto boot_menu
 if /I "%MAINCHOICE%"=="X" exit /b
+
 echo Invalid choice. Try again.
 timeout /t 2 >nul
 goto mainmenu
@@ -140,19 +152,24 @@ IF %ERRORLEVEL% NEQ 0 (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
     exit /b
 )
+
 set "WAVE_INSTALL=C:\WaveSetup"
 set "WAVE_DIR=%LOCALAPPDATA%\Wave"
 set "WAVE_WEBVIEW=%LOCALAPPDATA%\Wave.WebView2"
 set "TargetDir=%WAVE_INSTALL%\Dependencies"
+
 echo [+] Applying Windows Defender exclusions...
 powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue"
+
 echo [*] Cleaning up old processes and files...
 taskkill /f /im "Wave.exe" /im "Wave-Setup.exe" /im "Bloxstrap.exe" /im "Fishstrap.exe" /im "Roblox.exe" >nul 2>&1
 rmdir /s /q "%WAVE_WEBVIEW%" 2>nul
 rmdir /s /q "%WAVE_DIR%" 2>nul
 rmdir /s /q "%TargetDir%" 2>nul
+
 if not exist "%TargetDir%" mkdir "%TargetDir%"
 if not exist "%WAVE_DIR%\Tabs" mkdir "%WAVE_DIR%\Tabs"
+
 echo.
 echo [*] Installing Verified Dependencies...
 echo.
@@ -177,11 +194,13 @@ call :DownloadInstall "https://download.microsoft.com/download/1/6/5/165255E7-10
 echo [+] VC++ 2008...
 call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe" "vc2008_x86.exe" "/qb"
 call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe" "vc2008_x64.exe" "/qb"
+
 echo [+] WebView2Loader...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
 echo.
 echo [+] WebView2Loader...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
+
 echo [*] Moving WebView2Loader.dll to C:\WaveSetup...
 if exist "%TargetDir%\WebView2Loader.dll" (
     move /y "%TargetDir%\WebView2Loader.dll" "%WAVE_INSTALL%\WebView2Loader.dll" >nul
@@ -189,14 +208,17 @@ if exist "%TargetDir%\WebView2Loader.dll" (
 ) else (
     echo [ERROR] WebView2Loader.dll was not downloaded.
 )
+
 echo.
 echo [*] Downloading Wave.exe...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri \"%WaveURL%\" -OutFile \"%InstallerPath%\" -UserAgent 'Mozilla/5.0'"
+
 if not exist "%InstallerPath%" (
     echo [Error] Download failed. Check internet.
     pause
     goto mainmenu
 )
+
 echo [Success] Wave.exe downloaded.
 echo.
 echo [*] Creating desktop shortcut...
@@ -236,7 +258,6 @@ if %errorlevel% neq 0 (
   pause
   goto mainmenu
 )
-
 echo.
 echo [+] All Defender exclusions applied!
 pause
@@ -268,6 +289,7 @@ echo [+] Defender exclusions applied.
 echo.
 echo [*] Fixing Wave Module...
 echo.
+
 set "MODULE_URL=https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/Module.zip"
 set "ZIP_NAME=Wave_Module.zip"
 set "DEST_DIR=%LOCALAPPDATA%"
@@ -275,11 +297,13 @@ set "WAVE_DIR=%DEST_DIR%\Wave"
 set "WV2_DIR=%DEST_DIR%\Wave.WebView2"
 echo [*] Target folder: "%DEST_DIR%"
 echo.
+
 echo [*] Stopping Wave processes...
 taskkill /f /im Wave.exe >nul 2>&1
 taskkill /f /im msedgewebview2.exe >nul 2>&1
 taskkill /f /im msedge.exe >nul 2>&1
 timeout /t 2 >nul
+
 echo [*] Removing old Wave folders...
 if exist "%WAVE_DIR%" (
     echo     - Deleting "%WAVE_DIR%"
@@ -289,6 +313,7 @@ if exist "%WV2_DIR%" (
     echo     - Deleting "%WV2_DIR%"
     rmdir /s /q "%WV2_DIR%"
 )
+
 if exist "%WAVE_DIR%" (
     echo [ERROR] Failed to delete "%WAVE_DIR%"
     pause
@@ -315,11 +340,37 @@ if not exist "%DEST_DIR%\%ZIP_NAME%" (
 echo [*] Extracting module...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "Expand-Archive -Force '%DEST_DIR%\%ZIP_NAME%' '%DEST_DIR%'"
+
 del "%DEST_DIR%\%ZIP_NAME%" >nul 2>&1
+echo.
+
+echo [*] Fixing permissions for Wave folders...
+if exist "%WAVE_DIR%" (
+  takeown /f "%WAVE_DIR%" /r /d y >nul 2>&1
+)
+if exist "%WV2_DIR%" (
+  takeown /f "%WV2_DIR%" /r /d y >nul 2>&1
+)
+if exist "%WAVE_DIR%" (
+  icacls "%WAVE_DIR%" /inheritance:e /T /C >nul 2>&1
+)
+if exist "%WV2_DIR%" (
+  icacls "%WV2_DIR%" /inheritance:e /T /C >nul 2>&1
+)
+if exist "%WAVE_DIR%" (
+  icacls "%WAVE_DIR%" /grant "%USERNAME%:(OI)(CI)F" /T /C >nul 2>&1
+)
+if exist "%WV2_DIR%" (
+  icacls "%WV2_DIR%" /grant "%USERNAME%:(OI)(CI)F" /T /C >nul 2>&1
+)
+
+echo [+] Permissions applied to:
+echo     %WAVE_DIR%
+echo     %WV2_DIR%
 echo.
 echo [*] Wave module fixed successfully.
 echo [*] Launching Wave...
-set "WAVE_EXE="
+
 echo [*] Looking for Wave...
 set "WAVE_FOUND="
 
@@ -328,6 +379,7 @@ if exist "%USERPROFILE%\Desktop\wave.lnk" (
     start "" "%USERPROFILE%\Desktop\wave.lnk"
     goto :LaunchDone
 )
+
 for %%P in (
   "%USERPROFILE%\Desktop\wave.exe"
   "%USERPROFILE%\Downloads\wave.exe"
@@ -407,10 +459,12 @@ taskkill /f /im Wave.exe >nul 2>&1
 taskkill /f /im msedgewebview2.exe >nul 2>&1
 taskkill /f /im msedge.exe >nul 2>&1
 timeout /t 2 >nul
+
 set "WAVE_LOADER_DIR=%LOCALAPPDATA%\wave"
 set "ZIP_URL=https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/Loader.zip"
 set "ZIP_PATH=%TEMP%\Loader.zip"
 if not exist "%WAVE_LOADER_DIR%" mkdir "%WAVE_LOADER_DIR%"
+
 echo [*] Downloading Loader.zip...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "try { ^
@@ -454,6 +508,42 @@ if errorlevel 1 (
     pause
     goto mainmenu
 )
+
+echo.
+echo [*] Fixing permissions for Loader/Wave folders...
+if exist "%WAVE_LOADER_DIR%" (
+  takeown /f "%WAVE_LOADER_DIR%" /r /d y >nul 2>&1
+)
+if exist "%WAVE_DIR%" (
+  takeown /f "%WAVE_DIR%" /r /d y >nul 2>&1
+)
+if exist "%WAVE_WEBVIEW%" (
+  takeown /f "%WAVE_WEBVIEW%" /r /d y >nul 2>&1
+)
+if exist "%WAVE_LOADER_DIR%" (
+  icacls "%WAVE_LOADER_DIR%" /inheritance:e /T /C >nul 2>&1
+)
+if exist "%WAVE_DIR%" (
+  icacls "%WAVE_DIR%" /inheritance:e /T /C >nul 2>&1
+)
+if exist "%WAVE_WEBVIEW%" (
+  icacls "%WAVE_WEBVIEW%" /inheritance:e /T /C >nul 2>&1
+)
+if exist "%WAVE_LOADER_DIR%" (
+  icacls "%WAVE_LOADER_DIR%" /grant "%USERNAME%:(OI)(CI)F" /T /C >nul 2>&1
+)
+if exist "%WAVE_DIR%" (
+  icacls "%WAVE_DIR%" /grant "%USERNAME%:(OI)(CI)F" /T /C >nul 2>&1
+)
+if exist "%WAVE_WEBVIEW%" (
+  icacls "%WAVE_WEBVIEW%" /grant "%USERNAME%:(OI)(CI)F" /T /C >nul 2>&1
+)
+echo [+] Permissions applied to:
+echo     %WAVE_LOADER_DIR%
+echo     %WAVE_DIR%
+echo     %WAVE_WEBVIEW%
+echo.
+
 set "FOUND_LOADER="
 for /r "%WAVE_LOADER_DIR%" %%F in (Loader.exe) do (
     set "FOUND_LOADER=%%F"
@@ -480,6 +570,7 @@ if exist "%USERPROFILE%\Desktop\wave.lnk" (
     start "" "%USERPROFILE%\Desktop\wave.lnk"
     goto :LaunchDone
 )
+
 for %%P in (
   "%USERPROFILE%\Desktop\wave.exe"
   "%USERPROFILE%\Downloads\wave.exe"
@@ -489,11 +580,11 @@ for %%P in (
 ) do (
   if exist "%%~P" (
     set "WAVE_FOUND=%%~P"
-    goto :WaveExeFound
+    goto :WaveExeFound_L
   )
 )
 
-:WaveExeFound
+:WaveExeFound_L
 if defined WAVE_FOUND (
     echo     - Found Wave exe: "%WAVE_FOUND%"
     start "" "%WAVE_FOUND%"
@@ -514,10 +605,10 @@ for %%S in (
 echo [*] Not found in common locations. Scanning C:\ for wave.exe (this may take a bit)...
 for /f "delims=" %%F in ('where /r C:\ wave.exe 2^>nul') do (
     set "WAVE_FOUND=%%F"
-    goto :WaveExeFound2
+    goto :WaveExeFound2_L
 )
 
-:WaveExeFound2
+:WaveExeFound2_L
 if defined WAVE_FOUND (
     echo     - Found by scan: "%WAVE_FOUND%"
     start "" "%WAVE_FOUND%"
@@ -567,7 +658,6 @@ echo.
 echo [1/3] Enabling Windows Time service...
 sc config w32time start= auto >nul 2>&1
 net start w32time >nul 2>&1
-
 echo [2/3] Forcing time resync...
 w32tm /resync /force >nul 2>&1
 powershell -NoProfile -Command "Set-Date (Get-Date)" >nul 2>&1
@@ -634,6 +724,7 @@ IF %ERRORLEVEL% EQU 0 (
         goto mainmenu
     )
 )
+
 echo.
 echo [4] Rebuilding WMI repository (safe rename)...
 set "NEED_REBOOT=1"
@@ -665,7 +756,7 @@ exit /b
 :Auto_Fix_Runtimes
 cls
 echo +==========================================================================+
-echo ^|                    FULL DEPENDENCY INSTALLER (FINAL)                     ^|
+echo ^|                    FULL DEPENDENCY INSTALLER                           ^|
 echo +==========================================================================+
 echo.
 set "MainDir=C:\WaveSetup"
@@ -710,6 +801,7 @@ echo.
 echo [Success] All .NET and Visual C++ dependencies are ready.
 pause
 goto mainmenu
+
 :DownloadInstall
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '%~1' -OutFile '%TargetDir%\%~2' -UserAgent 'Mozilla/5.0'"
 if exist "%TargetDir%\%~2" (
@@ -749,6 +841,7 @@ if "%CHOICE%"=="3" (
     set "BOOT_NAME=Fishstrap"
     set "BOOT_URL=https://github.com/fishstrap/fishstrap/releases/download/v2.9.1.2/Fishstrap-v2.9.1.2.exe"
 )
+
 if /I "%CHOICE%"=="B" goto mainmenu
 if not defined BOOT_NAME goto boot_menu
 
@@ -835,4 +928,13 @@ if "%IS_ZIP%"=="1" (
 
 echo.
 pause
+goto mainmenu
+
+:LaunchDone
+echo.
+echo [*] Returning to main menu...
+timeout /t 2 >nul
+goto mainmenu
+
+:: End guard: if anything ever falls through, don’t close
 goto mainmenu
