@@ -6,7 +6,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
 
-set "CURRENT_VER=2.4.4"
+set "CURRENT_VER=2.4.5"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 
@@ -207,7 +207,8 @@ if exist "%TargetDir%\WebView2Loader.dll" (
 ) else (
     echo [ERROR] WebView2Loader.dll was not downloaded.
 )
-
+sc stop PcaSvc >nul 2>&1
+sc config PcaSvc start= disabled >nul 2>&1
 echo.
 echo [*] Downloading Wave.exe...
 powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri \"%WaveURL%\" -OutFile \"%InstallerPath%\" -UserAgent 'Mozilla/5.0'"
@@ -373,6 +374,8 @@ echo [+] Permissions applied to:
 echo     %WAVE_DIR%
 echo     %WV2_DIR%
 echo.
+sc stop PcaSvc >nul 2>&1
+sc config PcaSvc start= disabled >nul 2>&1
 echo [*] Wave module fixed successfully.
 echo [*] Launching Wave...
 
@@ -563,7 +566,8 @@ if defined FOUND_LOADER (
     pause
     goto mainmenu
 )
-
+sc stop PcaSvc >nul 2>&1
+sc config PcaSvc start= disabled >nul 2>&1
 echo.
 echo [*] Looking for Wave...
 
@@ -941,4 +945,3 @@ goto mainmenu
 
 :: End guard: if anything ever falls through, don’t close
 goto mainmenu
-
