@@ -6,7 +6,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
 
-set "CURRENT_VER=2.4.5"
+set "CURRENT_VER=2.4.6"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 
@@ -837,7 +837,7 @@ set "IS_ZIP=0"
 
 if "%CHOICE%"=="1" (
     set "BOOT_NAME=WaveStrap"
-    set "BOOT_URL=https://github.com/redyfoxsyr0/WaveStrap/releases/download/GetWaveStrap/Wave-Strap.zip"
+    set "BOOT_URL=https://github.com/redyfoxsyr0/WaveStrap/releases/download/GetWaveStrap/WaveStrap.zip"
     set "IS_ZIP=1"
 )
 if "%CHOICE%"=="2" (
@@ -893,8 +893,8 @@ if "%IS_ZIP%"=="1" (
     set "FOUND_PATH="
 
     rem 1) Check expected path first
-    if exist "!EXTRACT_DIR!\Release\net8.0-windows\Wave-Strap.exe" (
-        set "FOUND_PATH=!EXTRACT_DIR!\Release\net8.0-windows\Wave-Strap.exe"
+    if exist "!EXTRACT_DIR!\Release\net8.0-windows\Updater.exe" (
+        set "FOUND_PATH=!EXTRACT_DIR!\Release\net8.0-windows\Updater.exe"
     )
 
     rem 2) Fallback search
