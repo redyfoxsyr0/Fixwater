@@ -143,9 +143,11 @@ goto mainmenu
 :install_wave
 cls
 echo +==========================================================================+
-echo ^|                          INSTALLING WAVE                                 ^|
+echo ^|                          INSTALLING WAVE                              111 ^|
 echo +==========================================================================+
 echo.
+
+:: --- Admin Check ---
 NET SESSION >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo [!] Admin rights required.
@@ -153,81 +155,96 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b
 )
 
+:: --- Paths and Config ---
 set "WAVE_INSTALL=C:\WaveSetup"
 set "WAVE_DIR=%LOCALAPPDATA%\Wave"
 set "WAVE_WEBVIEW=%LOCALAPPDATA%\Wave.WebView2"
-set "TargetDir=%WAVE_INSTALL%\Dependencies"
+set "WAVE_ZIP_URL=https://getwave.gg/downloads/Wave.zip"
+set "TEMP_ZIP=%TEMP%\Wave.zip"
+set "EXTRACT_TEMP=%TEMP%\WaveExtract"
 
+:: --- Cleanup & Exclusions ---
 echo [+] Applying Windows Defender exclusions...
-powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue; if (Test-Path '%LOCALAPPDATA%\Wave\Loader.exe') { Add-MpPreference -ExclusionProcess '%LOCALAPPDATA%\Wave\Loader.exe' -ErrorAction SilentlyContinue }"
-echo [*] Cleaning up old processes and files...
-taskkill /f /im "Wave.exe" /im "Wave-Setup.exe" /im "Bloxstrap.exe" /im "Fishstrap.exe" /im "Roblox.exe" >nul 2>&1
-rmdir /s /q "%WAVE_WEBVIEW%" 2>nul
-rmdir /s /q "%WAVE_DIR%" 2>nul
-rmdir /s /q "%TargetDir%" 2>nul
+powershell -NoProfile -Command "Add-MpPreference -ExclusionPath '%WAVE_INSTALL%','%WAVE_DIR%','%WAVE_WEBVIEW%' -ErrorAction SilentlyContinue"
 
-if not exist "%TargetDir%" mkdir "%TargetDir%"
-if not exist "%WAVE_DIR%\Tabs" mkdir "%WAVE_DIR%\Tabs"
+echo [*] Cleaning up old processes...
+taskkill /f /im "Wave.exe" /im "Wave-Setup.exe" /im "Roblox.exe" >nul 2>&1
 
+if not exist "%WAVE_INSTALL%" mkdir "%WAVE_INSTALL%"
+
+:: --- Dependency Check (All Versions) ---
 echo.
-echo [*] Installing Verified Dependencies...
+echo [*] Checking Dependencies...
 echo.
-echo [+] .NET 8.0...
-call :DownloadInstall "https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe" "dotnet8.exe" "/install /quiet /norestart"
-echo [+] .NET 6.0...
-call :DownloadInstall "https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe" "dotnet6.exe" "/install /quiet /norestart"
-echo [+] .NET 3.1...
-call :DownloadInstall "https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe" "dotnet31.exe" "/install /quiet /norestart"
-echo [+] VC++ 2015-2022...
-call :DownloadInstall "https://aka.ms/vc14/vc_redist.x86.exe" "vc_modern_x86.exe" "/install /quiet /norestart"
-call :DownloadInstall "https://aka.ms/vc14/vc_redist.x64.exe" "vc_modern_x64.exe" "/install /quiet /norestart"
-echo [+] VC++ 2013...
-call :DownloadInstall "https://aka.ms/highdpimfc2013x86enu" "vc2013_x86.exe" "/passive /norestart"
-call :DownloadInstall "https://aka.ms/highdpimfc2013x64enu" "vc2013_x64.exe" "/passive /norestart"
-echo [+] VC++ 2012...
-call :DownloadInstall "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe" "vc2012_x86.exe" "/passive /norestart"
-call :DownloadInstall "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe" "vc2012_x64.exe" "/passive /norestart"
-echo [+] VC++ 2010...
-call :DownloadInstall "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe" "vc2010_x86.exe" "/passive /norestart"
-call :DownloadInstall "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe" "vc2010_x64.exe" "/passive /norestart"
-echo [+] VC++ 2008...
-call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe" "vc2008_x86.exe" "/qb"
-call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe" "vc2008_x64.exe" "/qb"
 
-echo [+] WebView2Loader...
-powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
+:: .NET 8.0
+powershell -Command "if (Get-ChildItem 'HKLM:\SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost' -ErrorAction SilentlyContinue | Get-ItemProperty | Where-Object {$_.Version -like '8.0*'}) { exit 0 } else { exit 1 }"
+if %ERRORLEVEL% NEQ 0 (
+    echo [+] Installing .NET 8.0...
+    call :DownloadInstall "https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe" "dotnet8.exe" "/install /quiet /norestart"
+) else ( echo [OK] .NET 8.0 detected. )
+
+:: .NET 6.0
+powershell -Command "if (Get-ChildItem 'HKLM:\SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost' -ErrorAction SilentlyContinue | Get-ItemProperty | Where-Object {$_.Version -like '6.0*'}) { exit 0 } else { exit 1 }"
+if %ERRORLEVEL% NEQ 0 (
+    echo [+] Installing .NET 6.0...
+    call :DownloadInstall "https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe" "dotnet6.exe" "/install /quiet /norestart"
+) else ( echo [OK] .NET 6.0 detected. )
+
+:: VC++ 2015-2022 (x64)
+reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" /v "Installed" | findstr "1" >nul
+if %ERRORLEVEL% NEQ 0 (
+    echo [+] Installing VC++ 2015-2022...
+    call :DownloadInstall "https://aka.ms/vc14/vc_redist.x64.exe" "vc_modern_x64.exe" "/install /quiet /norestart"
+) else ( echo [OK] VC++ 2015-2022 detected. )
+
+:: Universal Checker for Older VC++ (2013, 2012, 2010, 2008)
+for %%V in (2013,2012,2010,2008) do (
+    powershell -NoProfile -Command "$found = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like '*Visual C++ %%V*Redistributable (x64)*' }; if ($found) { exit 0 } else { exit 1 }"
+    if %ERRORLEVEL% EQU 0 (
+        echo [OK] VC++ %%V x64 detected.
+    ) else (
+        echo [+] Missing VC++ %%V. Installing...
+        if "%%V"=="2013" call :DownloadInstall "https://aka.ms/highdpimfc2013x64enu" "vc2013_x64.exe" "/passive /norestart"
+        if "%%V"=="2012" call :DownloadInstall "https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe" "vc2012_x64.exe" "/passive /norestart"
+        if "%%V"=="2010" call :DownloadInstall "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe" "vc2010_x64.exe" "/passive /norestart"
+        if "%%V"=="2008" call :DownloadInstall "https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe" "vc2008_x64.exe" "/qb"
+    )
+)
+
+:: WebView2Loader
+if not exist "%WAVE_INSTALL%\WebView2Loader.dll" (
+    echo [+] Downloading WebView2Loader...
+    powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%WAVE_INSTALL%\WebView2Loader.dll'"
+)
+
+:: --- Download and Extract Wave ---
 echo.
-echo [+] WebView2Loader...
-powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://github.com/redyfoxsyr0/Fixwater/releases/download/oryourdumb/WebView2Loader.dll' -OutFile '%TargetDir%\WebView2Loader.dll' -UserAgent 'Mozilla/5.0'"
+echo [*] Downloading Wave Update...
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%WAVE_ZIP_URL%' -OutFile '%TEMP_ZIP%'"
 
-echo [*] Moving WebView2Loader.dll to C:\WaveSetup...
-if exist "%TargetDir%\WebView2Loader.dll" (
-    move /y "%TargetDir%\WebView2Loader.dll" "%WAVE_INSTALL%\WebView2Loader.dll" >nul
-    echo [Success] Moved WebView2Loader.dll
+echo [*] Extracting and organizing files...
+if exist "%EXTRACT_TEMP%" rmdir /s /q "%EXTRACT_TEMP%"
+powershell -NoProfile -Command "Expand-Archive -Path '%TEMP_ZIP%' -DestinationPath '%EXTRACT_TEMP%' -Force"
+
+:: Moves contents of the 'Wave' folder inside the zip directly to C:\WaveSetup
+xcopy /e /y /h /i "%EXTRACT_TEMP%\Wave\*" "%WAVE_INSTALL%\" >nul
+
+:: Cleanup Zip/Temp
+rmdir /s /q "%EXTRACT_TEMP%"
+del /f /q "%TEMP_ZIP%"
+
+:: --- Final Launch ---
+if exist "%WAVE_INSTALL%\Wave.exe" (
+    echo [Success] Wave updated in %WAVE_INSTALL%
+    call :CreateDesktopShortcut "%WAVE_INSTALL%\Wave.exe" "Wave"
+    start "" "%WAVE_INSTALL%\Wave.exe"
 ) else (
-    echo [ERROR] WebView2Loader.dll was not downloaded.
-)
-sc stop PcaSvc >nul 2>&1
-sc config PcaSvc start= disabled >nul 2>&1
-echo.
-echo [*] Downloading Wave.exe...
-powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri \"%WaveURL%\" -OutFile \"%InstallerPath%\" -UserAgent 'Mozilla/5.0'"
-
-if not exist "%InstallerPath%" (
-    echo [Error] Download failed. Check internet.
+    echo [ERROR] Wave.exe not found after extraction!
     pause
-    goto mainmenu
 )
 
-echo [Success] Wave.exe downloaded.
-echo.
-echo [*] Creating desktop shortcut...
-call :CreateDesktopShortcut "%InstallerPath%" "Wave"
-echo.
-echo [*] Launching Wave.exe...
-powershell -NoProfile -Command "Start-Process -FilePath \"%InstallerPath%\" -Verb RunAs"
-echo [Success] Wave launched!
-timeout /t 4 >nul
+timeout /t 5 >nul
 goto boot_menu
 
 :DEFENDER_EXCLUSIONS
