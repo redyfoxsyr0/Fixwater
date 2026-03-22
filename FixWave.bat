@@ -910,8 +910,8 @@ if "%IS_ZIP%"=="1" (
     set "FOUND_PATH="
 
     rem 1) Check expected path first
-    if exist "!EXTRACT_DIR!\Release\net8.0-windows\Updater.exe" (
-        set "FOUND_PATH=!EXTRACT_DIR!\Release\net8.0-windows\Updater.exe"
+    if exist "!EXTRACT_DIR!\Release\net8.0-windows\WaveStrap.exe" (
+        set "FOUND_PATH=!EXTRACT_DIR!\Release\net8.0-windows\WaveStrap.exe"
     )
 
     rem 2) Fallback search
