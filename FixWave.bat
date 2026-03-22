@@ -6,7 +6,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 ::  Unauthorized copying, modification, or redistribution
 ::  of this script, in whole or in part, is strictly prohibited.
 
-set "CURRENT_VER=2.4.6"
+set "CURRENT_VER=2.4.7"
 set "RAW_VER=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/version.txt"
 set "RAW_BAT=https://raw.githubusercontent.com/redyfoxsyr0/Fixwater/refs/heads/main/FixWave.bat"
 
